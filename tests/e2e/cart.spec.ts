@@ -9,6 +9,13 @@ test.describe('Koszyk', () => {
     expect(await catalog.cartCount.textContent()).toBe('1');
   });
 
+  test('niezalogowany klient po dodaniu do koszyka trafia na strone logowania', async ({ api, page, catalog }) => {
+    await catalog.goto();
+    await catalog.addToCart('Etiopia Yirgacheffe');
+    await expect(page).toHaveURL(/\/login\?next=/);
+    await expect(page.getByRole('button', { name: 'Zaloguj' })).toBeVisible();
+  });
+
   test('pokazuje podsumowanie z dostawa', async ({ loggedInPage, api, cartPage }) => {
     await loggedInPage.request.post('/api/cart/items', { data: { productId: PRODUCTS.v60.id, quantity: 1 } });
     await cartPage.goto();
